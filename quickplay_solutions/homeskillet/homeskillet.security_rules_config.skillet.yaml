@@ -1,0 +1,41 @@
+# Start of preamble section
+name: quickplay_homeskillet_outbound_security_rules
+label: HomeSkillet Security Policy Configuration
+description: |
+  This playlist steps through the HomeSkillet security rulebase configurations.
+
+type: panos
+
+labels:
+  collection:
+    - Quickplay Sub-Skillets
+## End of preamble section
+
+
+## Start of variables section
+variables:
+  - name: TARGET_IP
+    description: Next-Gen Firewall IP or Hostname
+    default: 192.168.55.10
+    type_hint: fqdn_or_ip
+
+  - name: TARGET_USERNAME
+    description: Next-Gen Firewall Username
+    default: admin
+    type_hint: text
+
+  - name: TARGET_PASSWORD
+    description: Next-Gen Firewall Password
+    default: admin
+    type_hint: password
+
+## End of variables section
+
+
+## Start of snippets section
+snippets:
+
+    - name: panos_policy_snippets_outbound_security_rules
+      include: panos_policy_snippets_outbound_security_rules
+      include_variables: all
+## End of snippets section

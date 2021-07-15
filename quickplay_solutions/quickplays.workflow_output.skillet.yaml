@@ -1,0 +1,17 @@
+name: workflow_completion_report
+label: Workflow Completion Page
+description: Output page to show the workflow is completed
+
+type: template
+
+extends:
+
+labels:
+  collection:
+    - lib
+
+variables:
+
+snippets:
+  - name: quickplay_workflow_output
+    file: quickplays_workflow_output.j2
