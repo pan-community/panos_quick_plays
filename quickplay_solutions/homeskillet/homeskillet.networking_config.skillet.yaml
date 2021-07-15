@@ -1,0 +1,105 @@
+# Start of preamble section
+name: quickplay_homeskillet_networking_config_skillet
+label: HomeSkillet Networking Configuration
+description: |
+  This playlist steps through the HomeSkillet networking configurations
+  for either vwire, L3, or hybrid L2/L3.
+
+type: panos
+
+labels:
+  collection:
+    - Quickplay Sub-Skillets
+## End of preamble section
+
+
+## Start of variables section
+variables:
+  - name: TARGET_IP
+    description: Next-Gen Firewall IP or Hostname
+    default: 192.168.55.10
+    type_hint: fqdn_or_ip
+
+  - name: TARGET_USERNAME
+    description: Next-Gen Firewall Username
+    default: admin
+    type_hint: text
+
+  - name: TARGET_PASSWORD
+    description: Next-Gen Firewall Password
+    default: admin
+    type_hint: password
+
+  - name: HS_NETWORK_OPTION
+    description: Choose network config (vwire, layer3, layer3 w/ layer 2 interfaces)
+    default: 'layer3'
+    type_hint: dropdown
+    dd_list:
+      - key: 'vwire'
+        value: 'VWIRE'
+      - key: 'layer3'
+        value: 'LAYER3'
+      - key: 'layer3 w/ layer2 ints'
+        value: 'LAYER3_LAYER2'
+## End of variables section
+
+
+## Start of snippets section
+snippets:
+  # VWire networking configuration snippets
+  - name: panos_network_snippets_vwire
+    include: panos_network_snippets_vwire
+    include_variables:
+      - name: all
+        toggle_hint:
+          source: HS_NETWORK_OPTION
+          value:
+            - 'VWIRE'
+    when: "HS_NETWORK_OPTION == 'VWIRE'"
+
+  # Layer3 networking configuration snippets
+  - name: panos_network_snippets_layer3
+    include: panos_network_snippets_layer3
+    include_variables:
+      - name: all
+        toggle_hint:
+          source: HS_NETWORK_OPTION
+          value:
+            - 'LAYER3'
+    when: "HS_NETWORK_OPTION == 'LAYER3'"
+
+  # Hybrid L2 and L3 networking configuration snippets
+  - name: panos_network_snippets_layer3_with_layer2_interfaces
+    include: panos_network_snippets_layer3_with_layer2_interfaces
+    include_variables:
+      - name: all
+        toggle_hint:
+          source: HS_NETWORK_OPTION
+          value:
+            - 'LAYER3_LAYER2'
+    when: "HS_NETWORK_OPTION == 'LAYER3_LAYER2'"
+
+
+
+  # DHCP Server and NAT configuration for L3 and hybrid config
+  - name: panos_network_snippets_dhcp_server_basic
+    include: panos_network_snippets_dhcp_server_basic
+    include_variables:
+      - name: all
+        toggle_hint:
+          source: HS_NETWORK_OPTION
+          value:
+            - 'LAYER3_LAYER2'
+            - 'LAYER3'
+    when: "HS_NETWORK_OPTION == 'LAYER3_LAYER2' or HS_NETWORK_OPTION == 'LAYER3'"
+  - name: panos_network_snippets_nat_dipp
+    include: panos_network_snippets_nat_dipp
+    include_variables:
+      - name: all
+        toggle_hint:
+          source: HS_NETWORK_OPTION
+          value:
+            - 'LAYER3_LAYER2'
+            - 'LAYER3'
+    when: "HS_NETWORK_OPTION == 'LAYER3_LAYER2' or HS_NETWORK_OPTION == 'LAYER3'"
+## End of snippets section

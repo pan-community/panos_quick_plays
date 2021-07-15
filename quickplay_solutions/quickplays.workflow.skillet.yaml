@@ -1,0 +1,139 @@
+# Start of preamble section
+name: quickplays_workflow_skillet
+label: Quickplay Solution Workflow
+description: |
+  This workflow allows you to run any of the quickplay
+  solutions in a simple chain of execution.
+
+type: workflow
+
+labels:
+  collection:
+    - Quickplay Solutions
+## End of preamble section
+
+
+## Start of variables section
+variables:
+  - name: TARGET_IP
+    description: Next-Gen Firewall IP or Hostname
+    default: 192.168.55.10
+    type_hint: fqdn_or_ip
+
+  - name: TARGET_USERNAME
+    description: Next-Gen Firewall Username
+    default: admin
+    type_hint: text
+
+  - name: TARGET_PASSWORD
+    description: Next-Gen Firewall Password
+    default: admin
+    type_hint: password
+
+  - name: panos_sw_version
+    description: Next-Gen Firewall PAN-OS Version
+    default: v10.0
+    type_hint: dropdown
+    dd_list:
+      - key: v10.0
+        value: v10.0
+      - key: v10.1
+        value: v10.1
+
+  - name: deploy_execution_options
+    description: "DEPLOY | Check the boxes for which skillets to execute"
+    default: ['empty_starter_config']
+    type_hint: checkbox
+    cbx_list:
+      - key: Load empty NGFW baseline config
+        value: empty_starter_config
+      - key: Activate all licenses using an auth-code
+        value: activate_licenses
+      - key: Perform content update
+        value: do_content_update
+
+  - name: config_execution_options
+    description: "CONFIGURE | Check the boxes for which skillets to execute"
+    default: [ 'load_iron_skillet' ]
+    type_hint: checkbox
+    cbx_list:
+      - key: Configure for IronSkillet
+        value: load_iron_skillet
+      - key: Configure for K-12
+        value: load_k_12_config
+      - key: Configure for eSports
+        value: load_esports_config
+      - key: Configure for HomeSkillet
+        value: load_homeskillet_config
+
+  - name: assess_execution_options
+    description: "ASSESS | Check the boxes for which skillets to execute"
+    default: [ 'load_iron_skillet' ]
+    type_hint: checkbox
+    cbx_list:
+      - key: Assess pre-IronSkillet
+        value: assess_ironskillet_pre
+      - key: Assess post-IronSkillet
+        value: assess_ironskillet_post
+## End of variables section
+
+
+## Start of snippets section
+snippets:
+    # Deployment Skillets
+  - name: import_empty_config_ab8f807b-6c2d-4e0a-b302-88d225072b58
+    when: "'empty_starter_config' in deploy_execution_options"
+  - name: panos_ansible_activate_license
+    when: "'activate_licenses' in deploy_execution_options"
+    transform:
+      - name: ip_address
+        source: TARGET_IP
+      - name: username
+        source: TARGET_USERNAME
+      - name: password
+        source: TARGET_PASSWORD
+  - name: panos_ansible_content_update
+    when: "'do_content_update' in deploy_execution_options"
+    transform:
+      - name: ip_address
+        source: TARGET_IP
+      - name: username
+        source: TARGET_USERNAME
+      - name: password
+        source: TARGET_PASSWORD
+
+    # Gather FW information
+
+
+    # IronSkillet Configuration Skillets
+      # TO-DO: Add pre-validation skillet
+  - name: quickplays_ironskillet_v10_0
+    when: "'v10.0' in panos_sw_version and 'load_iron_skillet' in config_execution_options"
+  - name: quickplays_ironskillet_v10_1
+    when: "'v10.1' in panos_sw_version and 'load_iron_skillet' in config_execution_options"
+      # TO-DO: Add post-validation skillet
+
+
+    # K-12 Configuration Skillets
+  - name: quickplay_k_12_config_skillet
+    when: "'load_k_12_config' in config_execution_options"
+
+    # eSports Configuration Skillets
+  - name: quickplay_rest_get_interface_and_zone_names
+    when: "'load_esports_config' in config_execution_options"
+  - name: quickplay_esports_config_skillet
+    when: "'load_esports_config' in config_execution_options"
+
+    # HomeSkillet Configuration Skillets
+  - name: quickplay_rest_get_interface_and_zone_names
+    when: "'load_homeskillet_config' in config_execution_options"
+  - name: quickplay_homeskillet_networking_config_skillet
+    when: "'load_homeskillet_config' in config_execution_options"
+  - name: quickplay_rest_get_interface_and_zone_names
+    when: "'load_homeskillet_config' in config_execution_options"
+  - name: quickplay_homeskillet_outbound_security_rules
+    when: "'load_homeskillet_config' in config_execution_options"
+
+    # Final Output Completion Page
+  - name: workflow_completion_report
+## End of snippets section

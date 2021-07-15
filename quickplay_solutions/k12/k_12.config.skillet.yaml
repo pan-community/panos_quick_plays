@@ -1,0 +1,164 @@
+# snippets is used to load a full NGFW configuration
+
+# snippet folder name
+name: quickplay_k_12_config_skillet
+# label used for menu selection
+label: Configuration Skillet for K-12 Solution
+description: K-12 Safe Search Skillet baseline configuration for a firewall
+
+type: panos
+
+# grouping of like snippets for dynamic menu creation in pan-cnc
+labels:
+  collection:
+    - Quickplay Sub-Skillets
+
+# variables used in the configuration templates
+# type_hint defines the form field type in pan-cnc
+variables:
+  # this configuration allows you to select what type of Safe Search configuration
+  # to be used during the configuration build
+  - name: SAFE_SEARCH
+    description: Option 1 - What type of Safe Search configuration do you want to enable?
+    default: 'None'
+    type_hint: dropdown
+    toggle_hint:
+      source: SNIPPET_EXECUTION
+      value: safe_search
+    dd_list:
+      - key: 'None'
+        value: 'NONE'
+      - key: 'SSL Decryption'
+        value: 'SSL_DECRYPTION'
+      - key: 'DNS Proxy'
+        value: 'DNS_PROXY'
+      - key: 'Local DNS CNAME'
+        value: 'LOCAL_DNS_CNAME'
+
+  - name: INCLUDE_COUNTRY_BLOCK
+    description: Option 2 - Add rules to permit traffic only from US, Mexico, Canada, and Cloud Providers EDL?
+    default: 'No'
+    type_hint: dropdown
+    dd_list:
+      - key: 'Yes'
+        value: 'Yes'
+      - key: 'No'
+        value: 'No'
+
+  - name: INCLUDE_CHROMEBOOK_BYPASS
+    description: Option 3 - Add a no-decrypt rule for Chromebook specific URLs?
+    help_text: Chromebook specific URLs include the Google Play store, Google APIs, and other sites.
+    default: 'No'
+    type_hint: dropdown
+    dd_list:
+      - key: 'Yes'
+        value: 'Yes'
+      - key: 'No'
+        value: 'No'
+
+  - name: INCLUDE_SAML_BYPASS
+    description: Option 4 - Add a no-decrypt rule for SAML Providers.
+    default: 'No'
+    type_hint: dropdown
+    help_text: SAML Providers include Google Accounts and Microsoft Online.
+    dd_list:
+      - key: 'Yes'
+        value: 'Yes'
+      - key: 'No'
+        value: 'No'
+
+
+  # Brought in children variables that must be preserved with these definitions
+  - name: intf_internet
+    description: internet Interface
+    default: ethernet1/1
+    type_hint: dropdown
+    source: interface_names
+
+  - name: zone_internet
+    description: internet zone name
+    default: internet
+    type_hint: text
+
+  - name: intf_internal
+    description: internal Interface
+    default: ethernet1/2
+    type_hint: dropdown
+    source: interface_names
+
+  - name: zone_internal
+    description: internal trust zone name
+    default: internal
+    type_hint: text
+
+  - name: internal_intf_ipaddr
+    description: internal interface ip address
+    default: 192.168.45.20/24
+    type_hint: text
+
+# snippets used for api configuration including xpath and element as file name
+# files will load in the order listed
+snippets:
+  # Rob Ringer requested the Allow HTTP Partial Response be disabled (normally enabled for IS)
+  - name: panos_ngfw_disable_http_partial_response
+    xpath: /config/devices/entry[@name='localhost.localdomain']/deviceconfig/setting
+    element: |-
+      <ctd>
+        <allow-http-range>no</allow-http-range>
+      </ctd>
+
+  - name: panos_network_snippets_layer3
+    include: panos_network_snippets_layer3
+    include_variables: all
+
+  - name: panos_k12_base_common_elements_10x
+    include: panos_k12_base_common_elements_10x
+    include_variables: all
+
+  - name: panos_k12_country_block_10x
+    include: panos_k12_country_block_10x
+    include_variables:
+      - name: all
+        toggle_hint:
+          source: INCLUDE_COUNTRY_BLOCK
+          value:
+            - 'Yes'
+    when: "'Yes' in INCLUDE_COUNTRY_BLOCK"
+
+  - name: panos_k12_ssl_decryption_10x
+    include: panos_k12_ssl_decryption_10x
+    include_variables:
+      - name: all
+        toggle_hint:
+          source: SAFE_SEARCH
+          value:
+            - 'SSL_DECRYPTION'
+    when: "'SSL_DECRYPTION' in SAFE_SEARCH"
+
+  - name: panos_k12_dns_proxy_10x
+    include: panos_k12_dns_proxy_10x
+    include_variables:
+      - name: all
+        toggle_hint:
+          source: SAFE_SEARCH
+          value:
+            - 'DNS_PROXY'
+    when: "'DNS_PROXY' in SAFE_SEARCH"
+
+  - name: panos_k12_local_dns_cname_10x
+    include: panos_k12_local_dns_cname_10x
+    include_variables:
+      - name: all
+        toggle_hint:
+          source: SAFE_SEARCH
+          value:
+            - 'LOCAL_DNS_CNAME'
+    when: "'LOCAL_DNS_CNAME' in SAFE_SEARCH"
+
+  - name: panos_k12_chromebook_no_decryption_10x
+    include: panos_k12_chromebook_no_decryption_10x
+    when: "'Yes' in INCLUDE_CHROMEBOOK_BYPASS"
+
+  - name: panos_k12_saml_no_decryption_10x
+    include: panos_k12_saml_no_decryption_10x
+    when: "'Yes' in INCLUDE_SAML_BYPASS"
