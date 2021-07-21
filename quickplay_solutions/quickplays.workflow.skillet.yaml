@@ -65,6 +65,8 @@ variables:
         value: load_esports_config
       - key: Configure for HomeSkillet
         value: load_homeskillet_config
+      - key: Configure for Best Practices
+        value: load_best_practices
 
   - name: assess_execution_options
     description: "ASSESS | Check the boxes for which skillets to execute"
@@ -133,6 +135,12 @@ snippets:
     when: "'load_homeskillet_config' in config_execution_options"
   - name: quickplay_homeskillet_outbound_security_rules
     when: "'load_homeskillet_config' in config_execution_options"
+
+    # Best Practices Configuration Skillets
+  - name: quickplay_rest_get_interface_and_zone_names
+    when: "'load_best_practices' in config_execution_options"
+  - name: quickplay_bp_playlist
+    when: "'load_best_practices' in config_execution_options"
 
     # Final Output Completion Page
   - name: workflow_completion_report

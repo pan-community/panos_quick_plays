@@ -11,6 +11,7 @@ The following configuration solutions are included in this workflow:
     * K-12 
     * eSports
     * HomeSkillet
+    * Best Practices 
 
 The workflow additionally provides these services:
 

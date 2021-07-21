@@ -13,3 +13,6 @@
 [submodule "submodules/panos-networking-configs"]
 	path = submodules/panos-networking-configs
 	url = https://gitlab.com/panw-gse/as/panos-networking-configs.git
+[submodule "submodules/panos-best-practices"]
+	path = submodules/panos-best-practices
+	url = https://gitlab.com/panw-gse/as/panos-best-practices.git
