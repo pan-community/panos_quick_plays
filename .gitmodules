@@ -6,13 +6,13 @@
 	url = https://github.com/annabarone/SLED-components.git
 [submodule "submodules/panos-ansible-upgrade-downgrade"]
 	path = submodules/panos-ansible-upgrade-downgrade
-	url = https://gitlab.com/panw-gse/tech-library/deploy/panos-ansible-upgrade-downgrade.git
+	url = https://github.com/PaloAltoNetworks/panos-ansible-upgrade-downgrade.git
 [submodule "submodules/deployment-tools"]
 	path = submodules/deployment-tools
-	url = https://gitlab.com/panw-gse/tech-library/deploy/deployment-tools.git
+	url = https://github.com/pan-community/deployment-tools.git
 [submodule "submodules/panos-networking-configs"]
 	path = submodules/panos-networking-configs
-	url = https://gitlab.com/panw-gse/as/panos-networking-configs.git
+	url = https://github.com/pan-community/panos-networking-configs.git
 [submodule "submodules/panos-best-practices"]
 	path = submodules/panos-best-practices
-	url = https://gitlab.com/panw-gse/as/panos-best-practices.git
+	url = https://github.com/pan-community/panos-best-practices.git
